@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <meta name="title" content="How Off-Policy Can GRPO Be? &mu;-GRPO for Efficient LLM Reinforcement Learning">
+  <meta name="description" content="&mu;-GRPO shows that stale GRPO rollouts can remain learnable and converts high rollout staleness into faster LLM reinforcement learning.">
+  <meta name="keywords" content="GRPO, reinforcement learning, RLVR, LLM reasoning, rollout staleness, off-policy learning, efficient training">
+  <!-- TODO: Replace anonymous metadata after review if appropriate. -->
+  <meta name="author" content="Minghao Tian, Yunfei Xie, Chen Wei">
+  <meta name="robots" content="index, follow">
+  <meta name="language" content="English">
+
+  <meta property="og:type" content="article">
+  <!-- TODO: Replace with institution or lab name after review if appropriate. -->
+  <meta property="og:site_name" content="Anonymous Research Project">
+  <meta property="og:title" content="How Off-Policy Can GRPO Be? &mu;-GRPO for Efficient LLM Reinforcement Learning">
+  <meta property="og:description" content="Large-stage GRPO with relaxed clipping and negative-advantage veto matches or improves standard GRPO while reducing rollout refreshes and wall-clock training time.">
+  <!-- TODO: Replace with the deployed project-page URL. -->
+  <meta property="og:url" content="https://YOUR_DOMAIN.com/mu-grpo">
+  <!-- TODO: Export a 1200x630 social preview image from the paper's overview figure. -->
+  <meta property="og:image" content="https://YOUR_DOMAIN.com/static/images/social_preview.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="&mu;-GRPO wall-clock speedup overview">
+  <meta property="article:published_time" content="2026-01-01T00:00:00.000Z">
+  <meta property="article:section" content="Research">
+  <meta property="article:tag" content="GRPO">
+  <meta property="article:tag" content="LLM Reinforcement Learning">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <!-- TODO: Replace or remove Twitter handles. -->
+  <meta name="twitter:site" content="@YOUR_TWITTER_HANDLE">
+  <meta name="twitter:creator" content="@AUTHOR_TWITTER_HANDLE">
+  <meta name="twitter:title" content="How Off-Policy Can GRPO Be? &mu;-GRPO for Efficient LLM Reinforcement Learning">
+  <meta name="twitter:description" content="&mu;-GRPO stabilizes high-staleness GRPO and achieves comparable or better reasoning performance with faster wall-clock training.">
+  <meta name="twitter:image" content="https://YOUR_DOMAIN.com/static/images/social_preview.png">
+  <meta name="twitter:image:alt" content="&mu;-GRPO wall-clock speedup overview">
+
+  <meta name="citation_title" content="How Off-Policy Can GRPO Be? &mu;-GRPO for Efficient LLM Reinforcement Learning">
+  <meta name="citation_author" content="Tian, Minghao">
+  <meta name="citation_author" content="Xie, Yunfei">
+  <meta name="citation_author" content="Wei, Chen">
+  <meta name="citation_publication_date" content="2026">
+  <!-- TODO: Add the hosted PDF URL. -->
+  <meta name="citation_pdf_url" content="https://YOUR_DOMAIN.com/static/pdfs/mugrpo-paper.pdf">
+
+  <meta name="theme-color" content="#2563eb">
+  <meta name="msapplication-TileColor" content="#2563eb">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://ajax.googleapis.com">
+  <link rel="preconnect" href="https://documentcloud.adobe.com">
+  <link rel="preconnect" href="https://cdn.jsdelivr.net">
+
+  <title>How Off-Policy Can GRPO Be? &mu;-GRPO for Efficient LLM Reinforcement Learning</title>
+
+  <link rel="icon" type="image/x-icon" href="static/images/favicon.ico">
+  <link rel="apple-touch-icon" href="static/images/icon.png">
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  <link rel="stylesheet" href="static/css/index.css">
+
+  <link rel="preload" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+
+  <noscript>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+  </noscript>
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <script defer src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script defer src="https://documentcloud.adobe.com/view-sdk/main.js"></script>
+  <script defer src="static/js/bulma-carousel.js"></script>
+  <script defer src="static/js/bulma-slider.js"></script>
+  <script defer src="static/js/index.js"></script>
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['\\(', '\\)']],
+        displayMath: [['\\[', '\\]']]
+      },
+      options: {
+        skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+    };
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "ScholarlyArticle",
+    "headline": "How Off-Policy Can GRPO Be? μ-GRPO for Efficient LLM Reinforcement Learning",
+    "description": "μ-GRPO organizes GRPO into a few large rollout-generation and optimization stages, stabilizing high-staleness training with relaxed clipping and negative-advantage veto.",
+    "author": [
+      {
+        "@type": "Person",
+        "name": "Minghao Tian",
+        "affiliation": {
+          "@type": "Organization",
+          "name": "Rice University"
+        }
+      },
+      {
+        "@type": "Person",
+        "name": "Yunfei Xie",
+        "affiliation": {
+          "@type": "Organization",
+          "name": "Rice University"
+        }
+      },
+      {
+        "@type": "Person",
+        "name": "Chen Wei",
+        "affiliation": {
+          "@type": "Organization",
+          "name": "Rice University"
+        }
+      }
+    ],
+    "datePublished": "2026-01-01",
+    "url": "https://YOUR_DOMAIN.com/mu-grpo",
+    "image": "https://YOUR_DOMAIN.com/static/images/social_preview.png",
+    "keywords": ["GRPO", "LLM reinforcement learning", "RLVR", "rollout staleness", "off-policy learning"],
+    "abstract": "Group Relative Policy Optimization is typically trained with frequent rollout refreshes. μ-GRPO shows that high-staleness rollouts can retain useful signal when localized negative-advantage instability is controlled, enabling faster wall-clock RL training.",
+    "isAccessibleForFree": true
+  }
+  </script>
+</head>
+<body>
+  <button class="scroll-to-top" onclick="scrollToTop()" title="Scroll to top" aria-label="Scroll to top">
+    <i class="fas fa-chevron-up"></i>
+  </button>
+
+  <main id="main-content">
+    <section class="hero publication-header">
+      <div class="hero-body">
+        <div class="container is-max-widescreen">
+          <div class="columns is-centered">
+            <div class="column has-text-centered">
+              <h1 class="title is-1 publication-title">How Off-Policy Can GRPO Be?<br>\(\mu\)-GRPO for Efficient LLM Reinforcement Learning</h1>
+
+              <div class="is-size-5 publication-authors hero-authors">
+                <span class="author-block">Minghao Tian,</span>
+                <span class="author-block">Yunfei Xie,</span>
+                <span class="author-block">Chen Wei</span>
+              </div>
+
+              <div class="is-size-5 publication-authors hero-affiliation">
+                <span class="author-block">Rice University</span>
+              </div>
+
+              <div class="column has-text-centered">
+                <div class="publication-links">
+                  <span class="link-block">
+                    <!-- TODO: Add hosted paper PDF, e.g., static/pdfs/mugrpo-paper.pdf or arXiv PDF. -->
+                    <a href="static/pdfs/mugrpo-paper.pdf" target="_blank" class="external-link button is-normal is-rounded is-dark">
+                      <span class="icon"><i class="fas fa-file-pdf"></i></span>
+                      <span>Paper</span>
+                    </a>
+                  </span>
+                  <span class="link-block">
+                    <!-- TODO: Replace with public code repository when released. -->
+                    <a href="#" target="_blank" class="external-link button is-normal is-rounded is-dark">
+                      <span class="icon"><i class="fab fa-github"></i></span>
+                      <span>Code (coming soon)</span>
+                    </a>
+                  </span>
+                  <span class="link-block">
+                    <a href="#BibTeX" class="external-link button is-normal is-rounded is-dark">
+                      <span class="icon"><i class="fas fa-quote-right"></i></span>
+                      <span>BibTeX</span>
+                    </a>
+                  </span>
+                </div>
+              </div>
+
+              <div class="hero-tldr">
+                <div class="content has-text-justified tldr-paragraph">
+                  <p>
+                    <strong class="tldr-label">TL;DR:</strong> Our work shows that GRPO has much stronger rollout-staleness tolerance than previously assumed, and that this tolerance can be converted into training efficiency when the right instability is controlled. We introduce \(\mu\)-GRPO, a high-staleness RL framework that organizes training into a few large generation&ndash;optimization stages and stabilizes stale-data reuse with relaxed clipping and negative-advantage veto. Extensive evaluation across five language models and multiple math reasoning benchmarks shows that \(\mu\)-GRPO matches standard GRPO's reasoning performance while achieving \(1.82\times\) faster rollout generation and \(1.53\times\) faster end-to-end training.
+                  </p>
+                </div>
+              </div>
+
+              <div class="hero-figure-card">
+                <img src="static/images/figure1-wall-clock-speedup.png" alt="Wall-clock training curve comparing GRPO and &mu;-GRPO" loading="eager">
+                <p class="figure-caption">
+                  <strong>Figure 1: Comparing GRPO and \(\mu\)-GRPO.</strong> Average accuracy across five math benchmarks over wall-clock time. \(\mu\)-GRPO uses four large rollout&ndash;optimization stages, inducing high rollout staleness while reducing rollout&ndash;training switching overhead. It reaches GRPO's performance with a \(2.2\times\) wall-clock speedup on DeepSeek-7B<sup><a href="#deepseek-note">1</a></sup>. Both methods are trained for 4096 updates.
+                </p>
+                <p class="figure-note" id="deepseek-note">
+                  <sup>1</sup> DeepSeek-7B denotes the Qwen2.5-Math-7B model distilled from DeepSeek-R1. See the <a href="https://huggingface.co/deepseek-ai/DeepSeek-R1-Distill-Qwen-7B" target="_blank" rel="noopener">Hugging Face model</a>.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section hero is-light" id="introduction">
+      <div class="container is-max-desktop">
+        <h2 class="title is-3 has-text-centered">Introduction</h2>
+        <div class="content has-text-justified">
+          <p>GRPO has become a central algorithm for reinforcement learning with verifiable rewards in large language model reasoning. In practice, however, GRPO is usually kept close to on-policy: rollout data are refreshed every few updates so that the behavior policy remains near the current policy. This conservative design improves stability, but also creates substantial system overhead from frequent rollout generation, weight synchronization, and switching between inference and training engines. In this work, we revisit whether GRPO really needs to be so conservative. We show that GRPO has much stronger rollout-staleness tolerance than previously assumed, and that this tolerance can be turned into real training efficiency once the localized instability of stale negative-advantage updates is controlled. Based on this finding, \(\mu\)-GRPO uses a few large generation&ndash;optimization stages to reuse stale rollouts for many updates, and stabilizes stale-data reuse with relaxed clipping and negative-advantage veto. Extensive evaluation across five language models and multiple math reasoning benchmarks shows that \(\mu\)-GRPO matches standard GRPO's reasoning performance while achieving \(1.82\times\) faster rollout generation and \(1.53\times\) faster end-to-end training.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="diagnosis">
+      <div class="container is-max-desktop">
+        <h2 class="title is-3 has-text-centered">Diagnosis: High Staleness Fails Locally</h2>
+        <div class="content has-text-justified">
+          <p>Naively increasing staleness reveals a clipping dilemma. Tight GRPO clipping keeps updates stable but clips away many stale-rollout gradients, causing learning to plateau. Relaxed clipping exposes those gradients and recovers early learning, but can later collapse.</p>
+          <p>The collapse is not generic off-policy failure. The paper identifies a localized signal: negative-advantage responses whose token likelihood under the current policy becomes extremely small relative to the behavior policy. After such a trigger, later suffix tokens are conditioned on a prefix the current policy is unlikely to reach, yet token-level GRPO can still update them aggressively. The diagnostic results in this section are measured on Qwen2.5-Math-7B.</p>
+        </div>
+
+        <div class="content has-text-justified masking-scopes">
+          <p>To localize the instability, we compare five masking scopes, applied only to negative-advantage responses:</p>
+          <ul>
+            <li><strong>No-Mask Baseline:</strong> Keeps the full, unaltered response.</li>
+            <li><strong>Trigger-token Mask \(\mathcal{T}(y)\):</strong> Removes all trigger tokens.</li>
+            <li><strong>Suffix Mask \(\mathcal{S}_{\kappa}(y)\):</strong> Removes all tokens from the trigger boundary, exclusive, to the end.</li>
+            <li><strong>Non-trigger Suffix Mask \(\mathcal{H}_{\kappa}(y) = \mathcal{S}_{\kappa}(y) \setminus \mathcal{T}(y)\):</strong> Masks the suffix tokens excluding trigger tokens.</li>
+            <li><strong>Sequence Mask \(\mathcal{S}_{\mathrm{seq}}(y)\):</strong> Masks the whole response once any trigger appears.</li>
+          </ul>
+        </div>
+
+        <div class="columns is-variable is-5">
+          <div class="column">
+            <div class="figure-card">
+              <img src="static/images/figure2-clipping-dilemma.png" alt="Clipping dilemma under high rollout staleness" loading="lazy">
+              <p class="figure-caption"><strong>Figure 2: Clipping creates a high-staleness dilemma.</strong> At \(\mu = 1024\), \([0.8, 1.2]\) bound clips many more tokens and plateaus at lower accuracy <span class="caption-blue">(blue)</span>, while relaxed clipping recovers early gains but later collapses <span class="caption-yellow">(yellow)</span>.</p>
+            </div>
+          </div>
+          <div class="column">
+            <div class="figure-card">
+              <img src="static/images/figure3-localizing-instability.png" alt="Masking scopes localize harmful post-trigger suffix updates" loading="lazy">
+              <p class="figure-caption"><strong>Figure 3: Localizing the harmful updates.</strong> Under relaxed clipping \([0, 5]\), masking only \(\mathcal{T}\) still collapses, while masking \(\mathcal{H}_{\kappa}\) or broader scopes keeps both accuracy and negative-advantage importance ratios stable.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="content has-text-justified">
+          <p>
+            The key issue is prefix support. Once a trigger appears at position \(\kappa\), its tiny local ratio enters every later prefix occupancy ratio, so teacher-forcing continues to update suffix tokens behind a prefix that the current policy is unlikely to generate. Token-level GRPO only checks each token's local ratio, and therefore can still apply large updates to post-trigger suffix tokens whose own local ratios are not tiny.
+          </p>
+          <p>
+            This explains why \(\mathcal{H}_{\kappa}\), rather than \(\mathcal{T}\), is the critical harmful set: trigger tokens already have tiny coefficients, while post-trigger suffix tokens inherit low prefix support but remain locally active.
+          </p>
+        </div>
+
+        <div class="diagnosis-example">
+          <h3>Illustration: why the suffix can be unsafe</h3>
+          <p class="illustration-lead">
+            A suffix can look locally reasonable while still being conditioned on a prefix that the current policy no longer supports.
+          </p>
+          <pre><code>... Assume x = 3. Then x² = 9.
+               ▲  └──────────┘
+       trigger token  normal local ratios,
+                      but behind an off-support prefix</code></pre>
+          <p class="trigger-ratio">
+            Here the trigger is the token <strong>3</strong>, whose local conditional probability ratio is extremely small:
+            \[
+              \frac{\pi_{\theta}(3 \mid \ldots\ \text{Assume } x =)}
+                   {\pi_{\mathrm{behav}}(3 \mid \ldots\ \text{Assume } x =)}
+              < 10^{-4}.
+            \]
+            But a suffix token can still have a normal local ratio, e.g.,
+            \[
+              \frac{\pi_{\theta}(\text{Then} \mid \ldots\ \text{Assume } x = 3.)}
+                   {\pi_{\mathrm{behav}}(\text{Then} \mid \ldots\ \text{Assume } x = 3.)}
+              = 0.8.
+            \]
+          </p>
+          <p>
+            The continuation <strong>"Then x² = 9"</strong> is the non-trigger suffix \(\mathcal{H}_{\kappa}\): it is perfectly reasonable under that prefix. \(\mu\)-GRPO vetoes the suffix because the prefix containing the trigger token is no longer supported, not because the suffix itself is bad.
+            The paper formalizes this prefix-support mismatch.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section hero is-light" id="method">
+      <div class="container is-max-desktop">
+        <h2 class="title is-3 has-text-centered">Method: \(\mu\)-GRPO</h2>
+        <div class="content has-text-justified">
+          <p>\(\mu\)-GRPO trains GRPO in a few large stages rather than many small rollout&ndash;optimization cycles. Each stage freezes the current policy, generates a large static rollout dataset, and then reuses that dataset for many optimizer updates. This design increases rollout staleness, but reduces expensive rollout refreshes, weight synchronization, and switching between inference and training engines.</p>
+        </div>
+
+        <div class="figure-card compact">
+          <img src="static/images/figure4-system-execution.png" alt="System-level execution of standard GRPO and &mu;-GRPO" loading="lazy">
+          <p class="figure-caption"><strong>Figure 4:</strong> \(\mu\)-GRPO reduces rollout refreshes from 1024 to 4 over 4096 model updates. Standard GRPO frequently alternates generation and optimization, while \(\mu\)-GRPO uses large rollout stages followed by long optimization phases to reduce synchronization overhead and GPU memory contention.</p>
+        </div>
+
+        <div class="method-box">
+          <div class="method-step">
+            <div class="step-number">1</div>
+            <div>
+              <h3>Generate a large static rollout dataset</h3>
+              <p>At the beginning of each stage, \(\mu\)-GRPO freezes the current policy as the behavior policy and uses it to sample response groups for a large prompt set. During decoding, it stores each response together with its group-normalized advantage and token-level behavior log-probabilities.</p>
+            </div>
+          </div>
+          <div class="method-step">
+            <div class="step-number">2</div>
+            <div>
+              <h3>Optimize for many updates on the same dataset</h3>
+              <p>After rollout generation finishes, the rollout engine can be released from memory. The trainer then optimizes the policy on the static dataset for many updates, computing importance ratios against the stored behavior log-probabilities.</p>
+            </div>
+          </div>
+          <div class="method-step">
+            <div class="step-number">3</div>
+            <div>
+              <h3>Stabilize stale-data reuse</h3>
+              <p>To preserve useful stale-rollout gradients, \(\mu\)-GRPO uses relaxed clipping. To prevent collapse, it applies negative-advantage veto: once a negative response crosses a low-ratio trigger boundary, \(\mu\)-GRPO masks the unsafe post-trigger updates before applying the GRPO objective.</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <section class="section" id="results">
+      <div class="container is-max-desktop">
+        <h2 class="title is-3 has-text-centered">Results: Performance and Efficiency</h2>
+        <div class="content has-text-justified">
+          <p>We compare \(\mu\)-GRPO against both standard low-staleness GRPO and naive high-staleness GRPO under the same 4096-update training budget. Simply increasing GRPO to \(\mu = 1024\) reduces rollout and wall-clock time, but hurts accuracy. \(\mu\)-GRPO keeps the efficiency benefit of large-stage rollout execution while recovering this lost performance, improving average accuracy from 41.8% to 48.0% on Qwen2.5-Math-7B and from 60.2% to 68.6% on DeepSeek-7B. Against standard GRPO, \(\mu\)-GRPO matches reasoning performance across all five model settings while reducing rollout-generation time by \(1.82\times\) and total wall-clock training time by \(1.53\times\) on average. Compared with M2PO under the same high-staleness regime, \(\mu\)-GRPO achieves competitive accuracy while further reducing rollout-generation time by \(1.87\times\) and total training time by \(1.49\times\), showing that \(\mu\)-GRPO more directly converts GRPO's staleness tolerance into end-to-end efficiency gains.</p>
+        </div>
+
+        <div class="figure-card results-figure">
+          <img src="static/images/figure5-main-table.png" alt="Main results table comparing GRPO, high-staleness GRPO, M2PO, and &mu;-GRPO across five models" loading="lazy">
+        </div>
+        <p class="figure-caption"><strong>Table 1: Performance (%) and efficiency comparison across five math reasoning benchmarks and five models.</strong> Bold marks the best Avg.; underline marks the fastest \(T_{\text{total}}\) among methods no worse than standard GRPO in Avg. Overall, \(\mu\)-GRPO achieves the strongest performance&ndash;efficiency trade-off.</p>
+      </div>
+    </section>
+
+    <!--
+    <section class="section hero is-light" id="beyond-math">
+      <div class="container is-max-desktop">
+        <h2 class="title is-3 has-text-centered">Beyond the Main Math Results</h2>
+        <div class="story-grid two-up">
+          <div class="story-card">
+            <h3>Coding tasks</h3>
+            <p>On Qwen2.5-Coder-7B trained with code_contests and evaluated on LiveCodeBench, GRPO and \(\mu\)-GRPO reach comparable accuracies, 39.3% and 38.6%. \(\mu\)-GRPO reduces wall-clock training time from 98.9h to 45.7h, a \(2.16\times\) speedup.</p>
+          </div>
+          <div class="story-card">
+            <h3>Asynchronous execution</h3>
+            <p>In a fully asynchronous verl setup, \(\mu\)-GRPO maintains comparable math accuracy, reduces total time from 22.3h to 17.4h, and lowers trainer idle ratio from 24.2% to 0.6%.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+    -->
+
+    <section class="section" id="BibTeX">
+      <div class="container is-max-desktop content">
+        <div class="bibtex-header">
+          <h2 class="title">BibTeX</h2>
+          <button class="copy-bibtex-btn" onclick="copyBibTeX()" title="Copy BibTeX to clipboard">
+            <i class="fas fa-copy"></i>
+            <span class="copy-text">Copy</span>
+          </button>
+        </div>
+        <!-- TODO: Replace with the official citation once the paper is public. -->
+        <pre id="bibtex-code"><code>@misc{tian2026mugrpo,
+  title={How Off-Policy Can GRPO Be? {\mu}-GRPO for Efficient LLM Reinforcement Learning},
+  author={Minghao Tian and Yunfei Xie and Chen Wei},
+  year={2026}
+}</code></pre>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="columns is-centered">
+        <div class="column is-8">
+          <div class="content">
+            <p>
+              This page was built using the <a href="https://github.com/eliahuhorwitz/Academic-project-page-template" target="_blank">Academic Project Page Template</a> which was adopted from the <a href="https://nerfies.github.io" target="_blank">Nerfies</a> project page.
+              You are free to borrow the source code of this website, we just ask that you link back to this page in the footer. <br> This website is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/" target="_blank">Creative Commons Attribution-ShareAlike 4.0 International License</a>.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>
